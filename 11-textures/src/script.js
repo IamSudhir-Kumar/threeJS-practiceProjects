@@ -20,8 +20,8 @@ loadingManager.onProgress = () => console.log('onProgress');
 loadingManager.onError = () => console.log('onError');
 
 const textureLoader = new THREE.TextureLoader(loadingManager);
-const texture = textureLoader.load('textures/door/color.jpg');
-
+// const texture = textureLoader.load('textures/door/color.jpg');
+const texture = textureLoader.load('textures/minecraft.png');
 texture.repeat.x = 2;
 texture.repeat.y = 3;
 texture.wrapS = THREE.RepeatWrapping;
@@ -30,7 +30,9 @@ texture.offset.x = 0.5;
 texture.offset.y = 0.5;
 
 texture.rotation = Math.PI / 4;
-
+texture.generateMipmaps = false; ///generateMipmaps is used to avoid the texture to be blurry
+texture.magFilter = THREE.NearestFilter; ///magFilter is used when the texture is bigger than the object
+//texture.minFilter = THREE.NearestFilter; ///minFilter is used when the texture is smaller than the object
 // Object
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ map: texture });
