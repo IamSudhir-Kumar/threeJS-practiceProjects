@@ -31,6 +31,20 @@ gltfLoader.load(
     '/models/hamburger.glb',
     (gltf) =>
     {
+        gltf.scene.rotateX(Math.PI * 0.5)
+        gltf.scene.position.y = 7
+        gltf.scene.traverse((child) =>
+        {   
+            if(child instanceof THREE.Mesh)
+            {
+                child.castShadow = true
+                child.receiveShadow = true
+            }
+        })
+       gltf.scene.position.z= 5
+       gltf.scene.metalness = 0.7
+         gltf.scene.roughness = 0.2
+        gltf.scene.scale.set(5, 5, 5);
         scene.add(gltf.scene)
     }
 )
