@@ -3,6 +3,7 @@
     "@react-three/drei": "^9.102.3",
     "@react-three/fiber": "^8.15.19",
     "gsap": "^3.12.5",
+    "lil-gui": "^0.19.2",
     "three": "^0.162.0"
   }
 }
