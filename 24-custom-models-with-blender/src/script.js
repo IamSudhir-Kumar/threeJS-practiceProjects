@@ -2,7 +2,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { ARButton } from 'three/examples/jsm/webxr/ARButton.js'
 import * as dat from 'lil-gui'
+import { render } from '@react-three/fiber'
 
 /**
  * Base
@@ -42,6 +44,7 @@ gltfLoader.load(
             }
         })
        gltf.scene.position.z= 5
+    // gltf.scene.position.set(0, 0, 10)
        gltf.scene.metalness = 0.7
          gltf.scene.roughness = 0.2
         gltf.scene.scale.set(5, 5, 5);
@@ -52,17 +55,17 @@ gltfLoader.load(
 /**
  * Floor
  */
-const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(50, 50),
-    new THREE.MeshStandardMaterial({
-        color: '#444444',
-        metalness: 0,
-        roughness: 0.5
-    })
-)
-floor.receiveShadow = true
-floor.rotation.x = - Math.PI * 0.5
-scene.add(floor)
+// const floor = new THREE.Mesh(
+//     new THREE.PlaneGeometry(50, 50),
+//     new THREE.MeshStandardMaterial({
+//         color: '#444444',
+//         metalness: 0,
+//         roughness: 0.5
+//     })
+// )
+// floor.receiveShadow = true
+// floor.rotation.x = - Math.PI * 0.5
+// scene.add(floor)
 
 /**
  * Lights
@@ -102,6 +105,11 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.xr.enabled = true
+    // renderer.xr.setReferenceSpaceType('local')
+    // renderer.xr.setSessionInit({ optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } })
+    document.body.appendChild(ARButton.createButton(renderer))
+    renderer.xr.updateCamera(camera)
 })
 
 /**
@@ -121,7 +129,8 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha : true
 })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
