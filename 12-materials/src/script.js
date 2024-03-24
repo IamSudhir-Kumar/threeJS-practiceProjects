@@ -58,34 +58,57 @@ const scene = new THREE.Scene()
 
 // const material = new THREE.MeshToonMaterial()
 // material.gradientMap = gradientTexture // It can be used to change the gradient of the object
-const material = new THREE.MeshStandardMaterial()
-material.metalness = 0.45 // It can be used to change the metalness of the object
-material.roughness = 0.65 // It can be used to change the roughness of the object
-material.map = doorColorTexture // It can be used to change the color of the object
-material.aoMap = doorAmbientOcclusionTexture // It can be used to change the ambient occlusion of the object
-material.aoMapIntensity = 1 // It can be used to change the intensity of the ambient occlusion
-material.displacementMap = doorHeightTexture // It can be used to change the height of the object
-material.displacementScale = 0.05 // It can be used to change the scale of the displacement
-material.metalnessMap = doorMetalnessTexture // It can be used to change the metalness of the object
+// const material = new THREE.MeshStandardMaterial()
+//  material.metalness = 0.45 // It can be used to change the metalness of the object
+//  material.roughness = 0.65 // It can be used to change the roughness of the object
+// material.map = doorColorTexture // It can be used to change the color of the object
+// material.aoMap = doorAmbientOcclusionTexture // It can be used to change the ambient occlusion of the object
+// material.aoMapIntensity = 1 // It can be used to change the intensity of the ambient occlusion
+// material.displacementMap = doorHeightTexture // It can be used to change the height of the object
+// material.displacementScale = 0.05 // It can be used to change the scale of the displacement
+// material.metalnessMap = doorMetalnessTexture // It can be used to change the metalness of the object
+// material.roughnessMap = doorRoughnessTexture // It can be used to change the roughness of the object
+// material.normalMap = doorNormalTexture // It increses the detail of the object
+// material.normalScale.set(0.5, 0.5) // It can be used to change the scale of the normal map
+// material.alphaMap = doorAlphaTexture // It can be used to change the alpha of the object
+// material.transparent = true // It can be used to make the object transparent
 
+const material = new THREE.MeshStandardMaterial()
+ material.metalness = 0.45 // It can be used to change the metalness of the object
+ material.roughness = 0.65 // It can be used to change the roughness of the object
+
+material.envMap = cubeTextureLoader.load([
+    '/textures/environmentMaps/2/px.jpg',
+    '/textures/environmentMaps/2/nx.jpg',
+    '/textures/environmentMaps/2/py.jpg',
+    '/textures/environmentMaps/2/ny.jpg',
+    '/textures/environmentMaps/2/pz.jpg',
+    '/textures/environmentMaps/2/nz.jpg',
+])
 
 gui.add(material, 'metalness').min(0).max(1).step(0.0001)
 gui.add(material, 'roughness').min(0).max(1).step(0.0001)
-
+gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.0001)
 gui.add(material, 'wireframe')
+gui.add(material, 'displacementScale').min(0).max(1).step(0.0001)
+
+
 const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.SphereGeometry(0.5, 64, 64),
     material
 )
 sphere.position.x = -1.5
+sphere.geometry.setAttribute('uv2', new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2))
 const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
+    new THREE.PlaneGeometry(1, 1, 100, 100),
     material
 )
+plane.geometry.setAttribute('uv2', new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2))
 const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.3, 0.2, 16, 32),
+    new THREE.TorusGeometry(0.3, 0.2, 64, 128),
     material
 )
+torus.geometry.setAttribute('uv2', new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2))
 torus.position.x = 1.5
 scene.add(sphere , plane, torus) 
 
