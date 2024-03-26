@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"
 /**
  * Base
  */
+
 // Debug
 const gui = new dat.GUI()
 
@@ -18,6 +19,18 @@ const scene = new THREE.Scene()
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+
+/*
+font
+*/
+const fontLoader = new THREE.FontLoader()
+fontLoader.load(
+    '/fonts/helvetiker_regular.typeface.json',
+    () =>
+    (
+        console.log('font loaded')
+    )
+)
 
 /**
  * Object
