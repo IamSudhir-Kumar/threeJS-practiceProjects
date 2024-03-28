@@ -15,13 +15,14 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
-const axes = new THREE.AxesHelper();
-scene.add(axes);
+// const axes = new THREE.AxesHelper();
+// scene.add(axes);
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
-const matcapTexture = textureLoader.load("/textures/matcaps/8.png");
+const matcapTexture = textureLoader.load("/textures/matcaps/3.png");
+const matcapTexture2 = textureLoader.load("/textures/matcaps/8.png");
 /*
 font
 */
@@ -40,10 +41,30 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
   });
   textGeometry.computeBoundingBox();
   textGeometry.center(); // It can be used to center the text
-  const textMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
-  const text = new THREE.Mesh(textGeometry, textMaterial);
+  const Material = new THREE.MeshMatcapMaterial({
+    matcap: matcapTexture,
+    wireframe: false,
+  });
+  const text = new THREE.Mesh(textGeometry, Material);
   scene.add(text);
-  gui.add(textMaterial, "wireframe").name("Wireframe");
+
+  const DonutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
+  // const DonutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture2 });
+  
+
+  for (let i = 0; i < 300; i++) {
+    const Donut = new THREE.Mesh(DonutGeometry, Material);
+    Donut.position.x = (Math.random() - 0.5) * 10;
+    Donut.position.y = (Math.random() - 0.5) * 10;
+    Donut.position.z = (Math.random() - 0.5) * 10;
+
+    Donut.rotation.x = Math.random() * Math.PI;
+    Donut.rotation.y = Math.random() * Math.PI;
+
+    const scale = Math.random();
+    Donut.scale.set(scale, scale, scale);
+    scene.add(Donut);
+  }
 });
 
 // /**
@@ -97,6 +118,8 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
+controls.minDistance = 1;
+controls.maxDistance = 7;
 /**
  * Renderer
  */
