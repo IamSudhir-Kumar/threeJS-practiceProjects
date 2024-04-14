@@ -17,7 +17,7 @@ const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
 const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
 const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
 const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
-const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
+const matcapTexture = textureLoader.load('/textures/matcaps/9.png')
 const gradientTexture = textureLoader.load('/textures/gradients/5.jpg')
 gradientTexture.minFilter = THREE.NearestFilter
 gradientTexture.magFilter = THREE.NearestFilter
@@ -46,8 +46,8 @@ const scene = new THREE.Scene()
 // const material = new THREE.MeshNormalMaterial()
 // material.flatShading = true // It can be used to make the object flatshading through this you can see the faces of the object 
 
-// const material = new THREE.MeshMatcapMaterial()
-// material.matcap = matcapTexture // It can be used to change the matcap of the object
+const material = new THREE.MeshMatcapMaterial()
+material.matcap = matcapTexture // It can be used to change the matcap of the object
 
 // const material = new THREE.MeshDepthMaterial()
 //const material = new THREE.MeshLambertMaterial() // It can be used to make the object lambert material
@@ -73,24 +73,24 @@ const scene = new THREE.Scene()
 // material.alphaMap = doorAlphaTexture // It can be used to change the alpha of the object
 // material.transparent = true // It can be used to make the object transparent
 
-const material = new THREE.MeshStandardMaterial()
- material.metalness = 0.45 // It can be used to change the metalness of the object
- material.roughness = 0.65 // It can be used to change the roughness of the object
+// const material = new THREE.MeshStandardMaterial()
+//  material.metalness = 0.45 // It can be used to change the metalness of the object
+//  material.roughness = 0.65 // It can be used to change the roughness of the object
 
-material.envMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/2/px.jpg',
-    '/textures/environmentMaps/2/nx.jpg',
-    '/textures/environmentMaps/2/py.jpg',
-    '/textures/environmentMaps/2/ny.jpg',
-    '/textures/environmentMaps/2/pz.jpg',
-    '/textures/environmentMaps/2/nz.jpg',
-])
+// material.envMap = cubeTextureLoader.load([
+//     '/textures/environmentMaps/2/px.jpg',
+//     '/textures/environmentMaps/2/nx.jpg',
+//     '/textures/environmentMaps/2/py.jpg',
+//     '/textures/environmentMaps/2/ny.jpg',
+//     '/textures/environmentMaps/2/pz.jpg',
+//     '/textures/environmentMaps/2/nz.jpg',
+// ])
 
-gui.add(material, 'metalness').min(0).max(1).step(0.0001)
-gui.add(material, 'roughness').min(0).max(1).step(0.0001)
-gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.0001)
-gui.add(material, 'wireframe')
-gui.add(material, 'displacementScale').min(0).max(1).step(0.0001)
+// gui.add(material, 'metalness').min(0).max(1).step(0.0001)
+// gui.add(material, 'roughness').min(0).max(1).step(0.0001)
+// gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.0001)
+// gui.add(material, 'wireframe')
+// gui.add(material, 'displacementScale').min(0).max(1).step(0.0001)
 
 
 const sphere = new THREE.Mesh(
