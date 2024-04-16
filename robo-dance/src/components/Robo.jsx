@@ -1,11 +1,30 @@
-
 import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
-
+import { useAnimations, useFBX, useGLTF } from "@react-three/drei";
+import { useEffect } from 'react';
 export function Robo(props) {
+    const group = useRef()
     const { nodes, materials } = useGLTF('models/robo.glb')
+    const { animations: entry } = useFBX("animation/Entry.fbx");
+
+    entry[0].name = "Entry";
+
+    const { actions } = useAnimations(entry, group);
+
+    useEffect(() => {
+        actions.Entry.play();
+    }, []);
+
+    const { animation } = props
+    useEffect(() => {
+        if (animation) {
+            actions.Entry.play();
+        } else {
+            actions.Entry.stop();
+        }
+    }, [animation, actions.Entry]);
+    
     return (
-        <group {...props} dispose={null}>
+        <group {...props} ref={group} dispose={null}>
             <group rotation={[Math.PI / 2, 0, 0]}>
                 <group rotation={[-Math.PI, 0, 0]} scale={0.01}>
                     <mesh geometry={nodes.mesh_3716_mesh_3716_0.geometry}
