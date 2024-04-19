@@ -22,13 +22,16 @@ function App() {
             <Scene />
           </SheetProvider>
           <Scroll html>
-            <div style={{ background: 'red', }}>
-              <h1>Page 1</h1>
+            <div className="bg-sky-500">
+              <h1 className="text-3xl font-bold underline">
+                Hello world!
+              </h1>
             </div>
-            <div style={{ background: 'green',  }}>
+
+            <div className="bg-sky-500 w-screen h-screen">
               <h1>Page 2</h1>
             </div>
-            <div style={{ background: 'blue',  }}>
+            <div className="bg-sky-500">
               <h1>Page 3</h1>
             </div>
           </Scroll>
