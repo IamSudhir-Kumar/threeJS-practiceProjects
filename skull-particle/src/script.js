@@ -37,7 +37,7 @@ container.appendChild(renderer.domElement) // add the renderer to html div
 /////////////////////////////////////////////////////////////////////////
 ///// CAMERAS CONFIG
 const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100)
-camera.position.set(34,16,-20)
+// camera.position.set(34,16,-20)
 scene.add(camera)
 
 /////////////////////////////////////////////////////////////////////////
@@ -69,12 +69,8 @@ scene.add(sunLight)
 ///// LOADING GLB/GLTF MODEL FROM BLENDER
 loader.load('models/gltf/skull.glb', function (gltf) {
 
-    gltf.scene.scale.set(0.3, 0.3, 0.3);
-    // gltf.scene.position.set( 0, -6, 0);
-    //gltf.scene.rotation.y = Math.PI / 2;
     gltf.scene.traverse((obj) => {
         if (obj.isMesh) {
-            obj.rotateY()
             sampler = new MeshSurfaceSampler(obj).build();
         }
     });
@@ -82,32 +78,32 @@ loader.load('models/gltf/skull.glb', function (gltf) {
     transformMesh()
 
    
-    // scene.add(gltf.scene)
+    //scene.add(gltf.scene)
 })
 
 
 /////////////////////////////////////////////////////////////////////////
 ///// TRANSFORM MESH INTO POINTS
-let sampler
-let uniforms = { mousePos: {value: new THREE.Vector3()}}
-let pointsGeometry = new THREE.BufferGeometry()
-const cursor = {x:0, y:0}
-const vertices = []
-const tempPosition = new THREE.Vector3()
+let sampler;
+let uniforms = { mousePos: { value: new THREE.Vector3() } };
+let pointsGeometry = new THREE.BufferGeometry();
+const cursor = { x: 0, y: 0 };
+const vertices = [];
+const tempPosition = new THREE.Vector3();
 
-function transformMesh(){
-    // Loop to sample a coordinate for each points
-    for (let i = 0; i < 99000; i ++) {
+function transformMesh() {
+    // Loop to sample a coordinate for each point
+    for (let i = 0; i < 99000; i++) {
         // Sample a random position in the model
-        sampler.sample(tempPosition)
+        sampler.sample(tempPosition);
         // Push the coordinates of the sampled coordinates into the array
-        vertices.push(tempPosition.x, tempPosition.y, tempPosition.z)
+        vertices.push(tempPosition.x, tempPosition.y, tempPosition.z);
     }
     
     // Define all points positions from the previously created array
-    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-    // Define the matrial of the points
+    // Define the material of the points
     const pointsMaterial = new THREE.PointsMaterial({
         color: 0xaf0707,
         size: 0.5,
@@ -117,38 +113,46 @@ function transformMesh(){
         depthWrite: false,
         sizeAttenuation: true,
         alphaMap: new THREE.TextureLoader().load('particle-texture.jpg')
-    })
+    });
 
     // Create the custom vertex shader injection
     pointsMaterial.onBeforeCompile = function(shader) {
-        shader.uniforms.mousePos = uniforms.mousePos
-        
+        shader.uniforms.mousePos = uniforms.mousePos;
+
         shader.vertexShader = `
           uniform vec3 mousePos;
           varying float vNormal;
           
           ${shader.vertexShader}`.replace(
           `#include <begin_vertex>`,
-          `#include <begin_vertex>   
+          `#include <begin_vertex>
             vec3 seg = position - mousePos;
             vec3 dir = normalize(seg);
             float dist = length(seg);
             if (dist < 1.5){
               float force = clamp(1.0 / (dist * dist), -0., .5);
               transformed += dir * force;
-              vNormal = force /0.5;
+              vNormal = force / 0.5;
             }
+            // Rotate each particle 90 degrees around the Y-axis
+            float angle = 5.5; // 90 degrees in radians
+            mat3 rotationMatrix = mat3(
+              -cos(angle), 0.0, sin(angle),
+              0.0, -1.5, 0.0,
+              sin(angle), 0.0, cos(angle)
+            );
+            transformed = rotationMatrix * transformed;
           `
-        )
-    }
+        );
+    };
 
     // Create an instance of points based on the geometry & material
-    const points = new THREE.Points(pointsGeometry, pointsMaterial)
+    const points = new THREE.Points(pointsGeometry, pointsMaterial);
 
     // Add them into the main group
-    scene.add(points)
-
+    scene.add(points);
 }
+
 /////////////////////////////////////////////////////////////////////////
 //// INTRO CAMERA ANIMATION USING TWEEN
 function introAnimation() {
@@ -227,9 +231,9 @@ gui.addColor(params,'color3').name('BG color').onChange(update)
 
 //////////////////////////////////////////////////
 //// ON MOUSE MOVE TO GET CAMERA POSITION
-document.addEventListener('mousemove', (event) => {
-    event.preventDefault()
+// document.addEventListener('mousemove', (event) => {
+//     event.preventDefault()
 
-    console.log(camera.position)
+//     console.log(camera.position)
 
-}, false)
+// }, false)
