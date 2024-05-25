@@ -1,5 +1,3 @@
-
-
 /////////////////////////////////////////////////////////////////////////
 ///// IMPORT
 import './main.css'
@@ -8,6 +6,7 @@ import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js"
 
 /////////////////////////////////////////////////////////////////////////
 //// DRACO LOADER TO LOAD DRACO COMPRESSED MODELS FROM BLENDER
@@ -63,26 +62,102 @@ const ambient = new THREE.AmbientLight(0xa0a0fc, 0.82)
 scene.add(ambient)
 
 const sunLight = new THREE.DirectionalLight(0xe8c37b, 1.96)
-sunLight.position.set(-69,44,14)
+//sunLight.position.set(-69,44,14)
 scene.add(sunLight)
 
 /////////////////////////////////////////////////////////////////////////
 ///// LOADING GLB/GLTF MODEL FROM BLENDER
 loader.load('models/gltf/skull.glb', function (gltf) {
 
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    scene.add(gltf.scene)
+    gltf.scene.scale.set(0.3, 0.3, 0.3);
+    // gltf.scene.position.set( 0, -6, 0);
+    //gltf.scene.rotation.y = Math.PI / 2;
+    gltf.scene.traverse((obj) => {
+        if (obj.isMesh) {
+            obj.rotateY()
+            sampler = new MeshSurfaceSampler(obj).build();
+        }
+    });
+
+    transformMesh()
+
+   
+    // scene.add(gltf.scene)
 })
 
+
+/////////////////////////////////////////////////////////////////////////
+///// TRANSFORM MESH INTO POINTS
+let sampler
+let uniforms = { mousePos: {value: new THREE.Vector3()}}
+let pointsGeometry = new THREE.BufferGeometry()
+const cursor = {x:0, y:0}
+const vertices = []
+const tempPosition = new THREE.Vector3()
+
+function transformMesh(){
+    // Loop to sample a coordinate for each points
+    for (let i = 0; i < 99000; i ++) {
+        // Sample a random position in the model
+        sampler.sample(tempPosition)
+        // Push the coordinates of the sampled coordinates into the array
+        vertices.push(tempPosition.x, tempPosition.y, tempPosition.z)
+    }
+    
+    // Define all points positions from the previously created array
+    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+
+    // Define the matrial of the points
+    const pointsMaterial = new THREE.PointsMaterial({
+        color: 0xaf0707,
+        size: 0.5,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        opacity: 0.8,
+        depthWrite: false,
+        sizeAttenuation: true,
+        alphaMap: new THREE.TextureLoader().load('particle-texture.jpg')
+    })
+
+    // Create the custom vertex shader injection
+    pointsMaterial.onBeforeCompile = function(shader) {
+        shader.uniforms.mousePos = uniforms.mousePos
+        
+        shader.vertexShader = `
+          uniform vec3 mousePos;
+          varying float vNormal;
+          
+          ${shader.vertexShader}`.replace(
+          `#include <begin_vertex>`,
+          `#include <begin_vertex>   
+            vec3 seg = position - mousePos;
+            vec3 dir = normalize(seg);
+            float dist = length(seg);
+            if (dist < 1.5){
+              float force = clamp(1.0 / (dist * dist), -0., .5);
+              transformed += dir * force;
+              vNormal = force /0.5;
+            }
+          `
+        )
+    }
+
+    // Create an instance of points based on the geometry & material
+    const points = new THREE.Points(pointsGeometry, pointsMaterial)
+
+    // Add them into the main group
+    scene.add(points)
+
+}
 /////////////////////////////////////////////////////////////////////////
 //// INTRO CAMERA ANIMATION USING TWEEN
 function introAnimation() {
     controls.enabled = false //disable orbit controls to animate the camera
     
-    new TWEEN.Tween(camera.position.set(1,-1,0 )).to({ // from camera position
-        x: 20, //desired x position to go
-        y: -1, //desired y position to go
-        z: 20.1 //desired z position to go
+    new TWEEN.Tween(camera.position.set(0,-1,0 )).to({ // from camera position
+        x: 66, //desired x position to go
+        y: 34, //desired y position to go
+        z: -7 //desired z position to go
     }, 6500) // time take to animate
     .delay(1000).easing(TWEEN.Easing.Quartic.InOut).start() // define delay, easing
     .onComplete(function () { //on finish animation
@@ -123,6 +198,7 @@ function rendeLoop() {
 rendeLoop() //start rendering
 
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js'
+import { Sampler } from '@react-three/drei'
 const gui = new GUI()
 
 // create parameters for GUI
