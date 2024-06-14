@@ -4,27 +4,22 @@ import { OBJLoader } from 'jsm/loaders/OBJLoader.js';
 import { EffectComposer } from 'jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'jsm/postprocessing/UnrealBloomPass.js';
-import { ARButton } from 'jsm/webxr/ARButton.js';
 
 // Initialize scene, camera, and renderer
 const w = window.innerWidth;
 const h = window.innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
-camera.position.set(0, 1.6, 3);  // Adjusted for AR
+camera.position.set(0, 1.6, 3); 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(w, h);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.xr.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// Add ARButton
-document.body.appendChild(ARButton.createButton(renderer));
-
-// Add OrbitControls (for debugging purposes)
+// Add OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.03;
@@ -46,9 +41,9 @@ scene.add(directionalLight);
 // Load textures
 const texLoader = new THREE.TextureLoader();
 const matcap = texLoader.load('./black-n-shiney2.jpg');
-const environmentMap = texLoader.load('./environment.jpg'); // Assuming you have an environment texture
+const environmentMap = texLoader.load('./environment.jpg'); 
 
-// Add a simple plane to represent the floor (for AR space reference)
+// Add a simple plane to represent the floor
 const floorGeometry = new THREE.PlaneGeometry(10, 10);
 const floorMaterial = new THREE.ShadowMaterial({ opacity: 0.3 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -164,7 +159,7 @@ const objs = [
   'goldfish3',
   'skull2',
 ];
-const path = './mtl/';
+const path = './obj/';
 objs.forEach((objName) => {
   loader.load(`${path}${objName}.obj`, (obj) => {
     obj.traverse((child) => {
@@ -185,10 +180,20 @@ function handleWindowResize() {
 }
 window.addEventListener('resize', handleWindowResize, false);
 
-// Debugging helper to ensure AR context
-renderer.xr.addEventListener('sessionstart', () => {
-  console.log('XR session started');
-});
-renderer.xr.addEventListener('sessionend', () => {
-  console.log('XR session ended');
-});
+// Save camera position to localStorage
+function saveCameraPosition() {
+  const position = camera.position.toArray();
+  localStorage.setItem('cameraPosition', JSON.stringify(position));
+}
+
+// Load camera position from localStorage
+function loadCameraPosition() {
+  const position = JSON.parse(localStorage.getItem('cameraPosition'));
+  if (position) {
+    camera.position.set(position[0], position[1], position[2]);
+    camera.updateProjectionMatrix();
+  }
+}
+
+window.addEventListener('beforeunload', saveCameraPosition, false);
+window.addEventListener('load', loadCameraPosition, false);
